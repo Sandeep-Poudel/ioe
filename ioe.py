@@ -4,7 +4,7 @@ import re
 import json
 
 
-#imports all the necessary libraries, if not present it install the modules.
+#tries to import the modules, if not found it installs them 
 try:
     import mechanize
 except ImportError:
@@ -25,6 +25,7 @@ except ImportError:
 br = mechanize.Browser()
 cookie_jar = mechanize.CookieJar()
 br.set_cookiejar(cookie_jar)
+
 
 
 # Initial function that get the required information from the user
@@ -67,13 +68,15 @@ def get_college():
     Paschimanchal  ---  3
     Exit           ---  99
     ''')
-    cllg = int(input("Enter your choice: "))
-    if cllg == 99:
-        sys.exit()
-    if cllg not in range(1, 4):
-        print("Invalid input!")
-    else:
-        return (college_map[cllg])
+    while True:
+        cllg = int(input("Enter your choice: "))
+        if cllg == 99:
+            sys.exit()
+        if cllg not in range(1, 4):
+            print("\nPlease enter a valid input \n")
+        else:
+            return (college_map[cllg])
+
 
 
 # Get the batch of the students you want to find details of 
@@ -87,22 +90,23 @@ def get_batch():
         4: "076",
         5: "075"
     }
-    print('''Select the admission year of the student:
-    2079 --- 1
-    2078 --- 2
-    2077 --- 3
-    2076 --- 4
-    2075 --- 5
-    Exit --- 99
-    ''')
-    yrs = int(input("Enter your choice: "))
-    if yrs == 99:
-        sys.exit()
-    if yrs not in year_map:
-        print("Invalid input!")
-        print("Please provide a valid input.")
-        return None
-    return year_map[yrs]
+    while True:
+        print('''Select the admission year of the student:
+        2079 --- 1
+        2078 --- 2
+        2077 --- 3
+        2076 --- 4
+        2075 --- 5
+        Exit --- 99
+        ''')
+        while True:
+            yrs = int(input("Enter your choice: "))
+            if yrs == 99:
+                sys.exit()
+            if yrs not in year_map:
+                print("\nPlease provide a valid input\n")
+            else:
+                return year_map[yrs]
 
 
 
@@ -118,24 +122,25 @@ def get_faculty():
         5: "BME",
         6: "BEI"
     }
-    print('''Enter the faculty of the students:
-    Computer Engineering    (BCT)  ---  1
-    Agriculture Engineering (BAG)  ---  2
-    Architecture            (BAR)  ---  3
-    Electrical Engineering  (BEL)  ---  4
-    Mechanical Engineering  (BME)  ---  5
-    Electronics Engineering (BEI)  ---  6
-    Back ---  00
-    Exit ---  99
-    ''')
-    fac = int(input("Enter your choice: "))
-    if fac == 99:
-        sys.exit()
-    if fac not in range(1, 5):
-        print("Invalid input!")
-        print("Please provide a valid input.")
-        return None
-    return faculty_map[fac]
+    while True:
+        print('''Enter the faculty of the students:
+        Computer Engineering    (BCT)  ---  1
+        Agriculture Engineering (BAG)  ---  2
+        Architecture            (BAR)  ---  3
+        Electrical Engineering  (BEL)  ---  4
+        Mechanical Engineering  (BME)  ---  5
+        Electronics Engineering (BEI)  ---  6
+        Back ---  00
+        Exit ---  99
+        ''')
+        while True:
+            fac = int(input("Enter your choice: "))
+            if fac == 99:
+                sys.exit()
+            if fac not in range(1, 5):
+                print("\nPlease enter a valid input \n")
+            return faculty_map[fac]
+
 
 
 
@@ -148,7 +153,11 @@ def get_faculty():
 def dataFile(college, batch, faculty,getYear):
     
     #creates the name for the json file
-    data_file = "Json files/"+college+batch+faculty+".json"
+    data_file = "Json_files/"+college+batch+faculty+".json"
+    if not os.path.exists("Json files"):
+        os.system("mkdir Json_files")
+    
+
     
     #tries to open the file. if file is present it checks if the Year user provided is present if not it adds the values for the year.
 
@@ -184,6 +193,10 @@ def dataFile(college, batch, faculty,getYear):
         with open(data_file, "r") as f:
             savedData = json.load(f)
             return {"dataInFile": savedData, "fileName": data_file}
+
+
+
+
 
 
 # Loops over the whole year and all the students to create username and password
@@ -241,6 +254,10 @@ def run(college, batch, faculty, noOfStudents, data,getYear):
             
 
 
+
+
+
+
 # Tries to login to the website
 # If sucessful runs the detail function to find the details of the student
 def login(username, password, data, students):
@@ -278,6 +295,10 @@ def login(username, password, data, students):
         
         #calling function to find the details and write it in files.
         details(data, students)
+
+
+
+
 
 
 # finds the detail of the student and writes it to the corresponding files
@@ -347,6 +368,9 @@ Blood Group: {str(foundData['BloodGroup'])}  \n
 
 
 
+
+
+
 #updates the data in the file so that you can start from the point where you stopped the script.
 def updateData(newMonth, newRoll, data, year):
     if year not in data["dataInFile"][0]:
@@ -360,6 +384,9 @@ def updateData(newMonth, newRoll, data, year):
 
     with open(data["fileName"], "w") as f:
         json.dump(data["dataInFile"], f)
+
+
+
 
 
 
