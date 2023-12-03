@@ -6,7 +6,6 @@ College: Purwanchal Campus
 Phone No: 9823004319 
 Address: Rupani  3 
 Birth Date: 2059-01-21 | 2002-05-04T00:00:00  
-
 Blood Group: None  
 
 ------------------------------------
@@ -18,7 +17,6 @@ College: Purwanchal Campus
 Phone No: 9816899622 
 Address: JANAKPUR 10 
 Birth Date: 2057-11-10 | 2001-02-21T00:00:00  
-
 Blood Group: None  
 
 ------------------------------------
@@ -298,6 +296,36 @@ College: Purwanchal Campus
 Phone No: 9811217773 
 Address: Bharatpur 10 
 Birth Date: 2059-11-29 | 2003-03-13T00:00:00  
+Blood Group: None  
+------------------------------------
+            
+------------------------------------
+Registration No: PUR078BCT014 
+Name : APEKSHA PARAJULI 
+College: Purwanchal Campus 
+Phone No: 9863873772 
+Address: Chaudandigadhi Municipality 7 
+Birth Date: 2059-04-27 | 2002-08-12T00:00:00  
+Blood Group: None  
+------------------------------------
+            
+------------------------------------
+Registration No: PUR078BCT001 
+Name : AASHUTOSH TIMILSINA 
+College: Purwanchal Campus 
+Phone No: 9811217773 
+Address: Bharatpur 10 
+Birth Date: 2059-11-29 | 2003-03-13T00:00:00  
+Blood Group: None  
+------------------------------------
+            
+------------------------------------
+Registration No: PUR079BCT008 
+Name : Anshu Kumar Shah 
+College: Purwanchal Campus 
+Phone No: 9815708027 
+Address: Shahidnagar  07 
+Birth Date: 2060-04-01 | 2003-07-17T00:00:00  
 Blood Group: None  
 ------------------------------------
             
