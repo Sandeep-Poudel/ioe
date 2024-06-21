@@ -9,13 +9,4 @@ Birth Date: 2061-03-22 | 2011-08-20T00:00:00
 Blood Group: None  
 ------------------------------------
             
-------------------------------------
-Registration No: PUR080BAR001 
-Name : ABHISEKH RAJBANSHI 
-College: Purwanchal Campus 
-Phone No: 9817055773 
-Address: Bhadrapur Municipality 6 
-Birth Date: 2061-03-22 | 2011-08-20T00:00:00  
-Blood Group: None  
-------------------------------------
-            
+\
