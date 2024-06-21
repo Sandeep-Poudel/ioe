@@ -3,6 +3,8 @@ import os
 import sys
 import re
 import json
+import socket
+from urllib.error import URLError
 
 # tries to import the modules, if not found it installs them
 try:
@@ -250,40 +252,44 @@ def run(college, batch, faculty, noOfStudents, data, getYear):
 # If sucessful runs the detail function to find the details of the student
 def login(username, password, data, students):
     global rep
+    timeout = 10.0
+    socket.setdefaulttimeout(timeout)
+
     try:
+        br = mechanize.Browser()
+
+        # Configuring the browser
+        br.addheaders = [
+            ('User-Agent', 'Opera/9.80 (Android; Opera Mini/32.0.2254/85. U; id) Presto/2.12.423 Version/12.16')]
+        br.set_handle_robots(False)
+        br._factory.is_html = True
+
+        # Open the login page
         br.open("http://exam.ioe.edu.np:81/Login")
 
-        # checking internet connection
+        # Select the form and fill in the details
+        br.select_form(nr=0)
+        br.form['UserName'] = username
+        br.form['Password'] = password
+        print("\r" + username + " " + password, end=" ")
 
-    except mechanize.HTTPError:
-        print("No internet Connection")
-        again = input("Do you want to try again? (y/n)")
-        if (again == "Y" or again == "y"):
-            main()
+        # Submit the form
+        response = br.submit()
+        response_data = response.read()
 
-    # Configuring the browser
-    br.addheaders = [
-        ('User-Agent', 'Opera/9.80 (Android; Opera Mini/32.0.2254/85. U; id) Presto/2.12.423 Version/12.16')]
-    br.set_handle_robots(False)
-    br._factory.is_html = True
-    br.select_form(nr=0)
-    br.form['UserName'] = username
-    br.form['Password'] = password
-    print("\r" + username + " " + password, end=" ")
-    br.submit()
-    response = br.response().read()
+        # Check the response
+        if not json.loads(response_data)['IsSuccess']:
+            br.back()
+        else:
+            rep = False
+            print("\r" + "\b\b\b\b         ")
+            br.open("http://exam.ioe.edu.np:81/StudentPortal/Dashboard")
+            # calling function to find the details and write it in files.
+            details(data, students)
 
-    # IF login is sucessful then the browser opens the dashboard where we can see the students details
-    # Else it returns back to the login page.
-    if not json.loads(response)['IsSuccess']:
-        br.back()
-    if json.loads(response)['IsSuccess']:
-        rep = False
-        print("\r"+"\b\b\b\b         ")
-        br.open("http://exam.ioe.edu.np:81/StudentPortal/Dashboard")
-        # calling function to find the details and write it in files.
-        details(data, students)
-
+    except (mechanize.HTTPError, URLError, socket.timeout) as e:
+        print("continuing...")
+   
 
 # finds the detail of the student and writes it to the corresponding files
 def details(data, students):
