@@ -366,16 +366,13 @@ def updateData(newMonth, newRoll, data, year):
 
 # sort the json file in ascending order of ROll number of students.
 # sorts in every sucessful login so that the details are shown in ascending order which makes it easier to find and search a specific person.
-
 def extract_number(registration_no):
-    print(registration_no)
-    # Extracts the last numeric part from the registration number
+    registration_no = str(registration_no)  # Ensure the input is a string
     match = re.search(r'\d+$', registration_no)
     if match:
         return int(match.group())
     else:
         return 0
-
 
 def sort(file):
     with open(file, "r") as f:
@@ -387,8 +384,6 @@ def sort(file):
     data[0]['arrayData'] = sorted(data[0]['arrayData'], key=extract_number)
     with open(file, "w") as f:
         json.dump(data, f)
-
-
 # running the main function
 if __name__ == '__main__':
     main()
