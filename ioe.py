@@ -256,7 +256,6 @@ def login(username, password, data, students):
     socket.setdefaulttimeout(timeout)
 
     try:
-        br = mechanize.Browser()
 
         # Configuring the browser
         br.addheaders = [
